@@ -79,7 +79,7 @@ final class LunchBell: NSObject, NSApplicationDelegate, ObservableObject {
         let label = schedule.scheduledTime(on: Date()).formatted(date: .omitted, time: .shortened)
         statusItem.button?.toolTip = enabled ? "Lunch Bell · \(label)" : "Lunch Bell · paused"
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Lunch at \(label) every day", action: nil, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Lunch at \(label) on weekdays", action: nil, keyEquivalent: ""))
         add("Enabled", #selector(toggleEnabled), to: menu).state = enabled ? .on : .off
         menu.addItem(.separator())
         add("Settings…", #selector(showSettings), to: menu, key: ",")
@@ -101,8 +101,13 @@ final class LunchBell: NSObject, NSApplicationDelegate, ObservableObject {
     @objc private func quit() { NSApp.terminate(nil) }
 
     @objc private func check() {
-        guard enabled, reminder == nil else { return }
+        guard enabled else { return }
         let now = Date()
+        guard schedule.isWeekday(now) else {
+            if !isPreview { closeReminder() }
+            return
+        }
+        guard reminder == nil else { return }
         var snooze = defaults.object(forKey: "snoozedUntil") as? Date
         if let date = snooze, !Calendar.current.isDate(date, inSameDayAs: now) {
             defaults.removeObject(forKey: "snoozedUntil")
@@ -226,11 +231,11 @@ struct SettingsView: View {
                 Image(systemName: "fork.knife.circle.fill").font(.system(size: 40)).foregroundStyle(.orange)
                 VStack(alignment: .leading) {
                     Text("Lunch Bell").font(.title2.bold())
-                    Text("A proper break, every day.").foregroundStyle(.secondary)
+                    Text("A proper break, every weekday.").foregroundStyle(.secondary)
                 }
             }
             DatePicker("Lunch time", selection: $app.time, displayedComponents: .hourAndMinute)
-            Toggle("Remind me every day", isOn: $app.enabled)
+            Toggle("Remind me Monday to Friday", isOn: $app.enabled)
             Toggle("Play a sound (repeats every 30 seconds)", isOn: $app.sound)
             Toggle("Open at login", isOn: Binding(get: { app.loginEnabled }, set: app.setLogin))
             if let error = app.loginError { Text(error).font(.caption).foregroundStyle(.red) }

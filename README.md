@@ -1,6 +1,6 @@
 # Lunch Bell
 
-A small native macOS menu bar app that makes lunch hard to forget. **11:21 every day**, or whatever time you choose. SwiftUI + AppKit; no dependencies, accounts, tracking, or network access.
+A small native macOS menu bar app that makes lunch hard to forget. **11:21 Monday to Friday**, or whatever time you choose. SwiftUI + AppKit; no dependencies, accounts, tracking, or network access.
 
 ## The alert
 
@@ -21,7 +21,7 @@ Releases are ad-hoc signed, **not notarised with an Apple Developer account**. m
 
 ## Behaviour
 
-- Runs every day, including weekends. Settings are saved locally using UserDefaults.
+- Reminds you Monday to Friday, using the Mac’s local calendar day. No scheduled alerts or snoozes on Saturday or Sunday; an unanswered weekday alert closes when the app next checks on a weekend. The menu bar app stays available and manual previews work any day. Settings are saved locally using UserDefaults.
 - Checks every five seconds while running. No reminder while the app is quit or the Mac is shut down.
 - If the Mac sleeps through lunch, it catches up after wake until 15:00. For lunch times after 14:00, the catch-up window ends one hour after the configured time, or at midnight if earlier. It does not wake the Mac.
 - Snoozes last ten minutes, survive an app restart, and expire at the end of the local calendar day. Acknowledging suppresses further alerts for that day, including after restarting or changing the time.
